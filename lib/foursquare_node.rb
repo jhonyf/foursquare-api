@@ -1,15 +1,23 @@
 module Foursquare
   class Node
-    def initialize(access_token)
-      @access_token       = access_token
+    def initialize(init_params={})
+      @access_token     = init_params[:access_token]
+      @client_id        = init_params[:client_id]
+      @client_secret    = init_params[:client_secret]
       @base_url = "https://api.foursquare.com:443/v2/"
     end
 
     def perform_graph_request(endpoint, params={}, method="get")
       require 'net/http'
+      require 'net/https'
 
       @query_string = "?"
-      @query_string += "oauth_token=#{CGI.escape(@access_token)}" unless @access_token.empty?
+      # if access token is not passed in, we will default to use the API as 'Userless access' 
+      if @access_token.nil? || @access_token.empty?
+        @query_string += "client_id=#{CGI.escape(@client_id)}&client_secret=#{CGI.escape(@client_secret)}"  
+      else
+        @query_string += "oauth_token=#{CGI.escape(@access_token)}"  
+      end
 
       if method=="get"
         params.each{|key, val| @query_string += "&#{key}=#{val}"}
