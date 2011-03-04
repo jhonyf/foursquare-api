@@ -20,7 +20,7 @@ module Foursquare
       end
 
       if method=="get"
-        params.each{|key, val| @query_string += "&#{key}=#{val}"}
+        params.each{|key, val| @query_string += "&#{key}=#{CGI.escape(val)}"}
         url = URI.parse("#{@base_url}#{endpoint}#{@query_string}")
         request = Net::HTTP::Get.new("#{url.path}?#{url.query}",{"Content-Type"=>"text/json"})
       else
